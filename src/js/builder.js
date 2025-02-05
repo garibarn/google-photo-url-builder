@@ -6,6 +6,7 @@
 goog.provide( 'GooglePhotoURL' );
 goog.provide( 'GooglePhotoURL.FileFormats' );
 goog.provide( 'GooglePhotoURL.OriginalFileFormats' );
+goog.provide( 'GooglePhotoURL.DEFINE.DEBUG' );
 goog.provide( 'GooglePhotoURL.Builder' );
 goog.provide( 'GooglePhotoURL.isGooglePhotoURL' );
 
@@ -43,6 +44,11 @@ GooglePhotoURL.DataTypes = {
     STRING  : 32
 };
 
+GooglePhotoURL.DEFINE = {};
+
+/** @define {boolean} */
+GooglePhotoURL.DEFINE.DEBUG = goog.define( 'GooglePhotoURL.DEFINE.DEBUG' , false );
+
 goog.scope(
     function(){
     /**************************************************************************
@@ -69,23 +75,23 @@ goog.scope(
 
         var COMMAND_DIFINITIONS = [
             'w', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setWidth( value );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 <= instance._width && instance._width !== instance._height ){
                         return 'w' + instance._width;
                     };
                 },
             'h', GooglePhotoURL.DataTypes.BOOLEAN | GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number | boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number | boolean} */ value ){
                     if( value === true ){
                         instance.setHTMLOutputEnabled( true );
                     } else {
                         instance.setHeight( /** @type {number} */ (value) );
                     };
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     var params = [];
 
                     if( 0 <= instance._height && instance._width !== instance._height ){
@@ -97,66 +103,71 @@ goog.scope(
                     return params.join( '-' );
                 },
             's', GooglePhotoURL.DataTypes.BOOLEAN | GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number | boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number | boolean} */ value ){
                     if( value === true ){
                         instance.setIngoringAspectRatio( true );
                     } else {
                         instance.setSize( /** @type {number} */ (value) );
                     };
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     var params = [];
 
                     if( 0 <= instance._width && instance._width === instance._height ){
                         params.push( 's' + instance._width );
                     };
                     if( instance._ingoringAspectRatio ){
+                        if( GooglePhotoURL.DEFINE.DEBUG ){
+                            if( !( 0 < instance._width && 0 < instance._height ) ){
+                                throw 'Ignoring the aspect ratio requires both w and h to be explicitly set.';
+                            };
+                        };
                         params.push( 's' );
                     };
                     return params.join( '-' );
                 },
             'nu', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setUpscaling( false );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( !instance._upscaling ){
                         return 'nu';
                     };
                 },
             'c', GooglePhotoURL.DataTypes.BOOLEAN | GooglePhotoURL.DataTypes.COLOR,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number | boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number | boolean} */ value ){
                     if( value === true ){
                         instance.setClopping( true );
                     } else {
                         currentColor = /** @type {number} */ (value);
                     };
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._clopping && !instance._cloppingToCircular && !instance.isFreeClopping() ){
                         return 'c';
                     };
                 },
             'cc', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setCloppingToCircular( true );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._cloppingToCircular ){
                         return 'cc';
                     };
                 },
             'p', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setCloppingDifferentFocus( true );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._cloppingDifferentFocus ){
                         return 'p';
                     };
                 },
             'fcrop64=', GooglePhotoURL.DataTypes.STRING,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {string} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {string} */ value ){
                     instance.setFreeClopping(
                         hexToUINT( value.substr(  2, 4 ) ) / 0xffff * 100,
                         hexToUINT( value.substr(  6, 4 ) ) / 0xffff * 100,
@@ -164,13 +175,13 @@ goog.scope(
                         hexToUINT( value.substr( 14, 4 ) ) / 0xffff * 100
                     );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     /**
                      * @param {number} percent
                      * @return {string} */
                     function uintToHex( percent ){
-                        percent = '000' + ( percent / 1000 * 0xffff | 0 ).toString( 16 ).substr( 2 );
-                        return percent.substr( percent.length - 4 );
+                        var hex = '000' + ( percent / 1000 * 0xffff | 0 ).toString( 16 ).substr( 2 );
+                        return hex.substr( hex.length - 4 );
                     };
                     if( instance.isFreeClopping() ){
                         return 'fcrop64=1,' + uintToHex( instance._clippingLeft   ) +
@@ -180,210 +191,210 @@ goog.scope(
                     };
                 },
             'fh', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFlippingHorizontally( true );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._flippingHorizontally ){
                         return 'fh';
                     };
                 },
             'fv', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFlippingVertically( true );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._flippingVertically ){
                         return 'fv';
                     };
                 },
             'r', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setRotation( value );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 < instance._rotation ){
                         return 'r' + instance._rotation;
                     };
                 },
             'ba', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setBadge( value );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 <= instance._badge ){
                         return 'ba' + instance._badge;
                     };
                 },
             'b', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setBorder( value, currentColor );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 < instance._borderWidth ){
                         return ( 0 <= instance._borderColor ? 'c' + uintToColorString( instance._borderColor ) + '-' : '' ) +
                                'b' + instance._borderWidth;
                     };
                 },
             'br', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setBorderRadius( value, currentBackgroundColor || currentColor );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 < instance._borderRadius ){
                         backgroundColorRequired = true;
                         return 'br' + instance._borderRadius;
                     };
                 },
             'bc', GooglePhotoURL.DataTypes.COLOR,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance._backgroundColor = currentBackgroundColor = value;
                 },
                 false,
             'pd', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setPadding( value, currentPaddingColor || currentColor );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 < instance._padding ){
                         return ( 0 <= instance._paddingColor ? 'pc' + uintToColorString( instance._paddingColor ) + '-' : '' ) +
                                'pd' + instance._padding;
                     };
                 },
             'pc', GooglePhotoURL.DataTypes.COLOR,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     currentPaddingColor = value;
                 },
                 false,
             'fSoften=', GooglePhotoURL.DataTypes.STRING,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {string} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {string} */ value ){
                     var blurringArgs = value.split( ',' );
 
                     instance.setBlur( Number( blurringArgs[ 1 ] ), Number( blurringArgs[ 2 ] ) );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 < instance._blurringAmount ){
                         return 'fSoften=0,' + instance._blurringAmount + ',' + instance._mixRatio;
                     };
                 },
             'rj', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFileFormat( GooglePhotoURL.FileFormats.JPEG );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._fileFormat === GooglePhotoURL.FileFormats.JPEG ){
                         backgroundColorRequired = true;
                         return 'rj';
                     };
                 },
             'rp', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFileFormat( GooglePhotoURL.FileFormats.PNG );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._fileFormat === GooglePhotoURL.FileFormats.PNG ){
                         return 'rp';
                     };
                 },
             'rw', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFileFormat( GooglePhotoURL.FileFormats.WEBP );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._fileFormat === GooglePhotoURL.FileFormats.WEBP ){
                         return 'rw';
                     };
                 },
             'rwa', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFileFormat( GooglePhotoURL.FileFormats.ANIMATED_WEBP );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._fileFormat === GooglePhotoURL.FileFormats.ANIMATED_WEBP ){
                         return 'rwa';
                     };
                 },
             'rg', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFileFormat( GooglePhotoURL.FileFormats.GIF );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._fileFormat === GooglePhotoURL.FileFormats.GIF ){
                         return 'rg';
                     };
                 },
             'rh', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFileFormat( GooglePhotoURL.FileFormats.MP4 );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._fileFormat === GooglePhotoURL.FileFormats.MP4 ){
                         backgroundColorRequired = true;
                         return 'rh';
                     };
                 },
             'nw', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setFileFormat( GooglePhotoURL.FileFormats.ORIGINAL );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._fileFormat === GooglePhotoURL.FileFormats.ORIGINAL ){
                         return 'nw';
                     };
                 },
             'ft', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setLoselessCompressioEnabled( true );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._loselessCompressioEnabled ){
                         return 'ft';
                     };
                 },
             'lo', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setForcingLoselessCompressioEnabled( true );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._forcingLoselessCompressioEnabled ){
                         return 'lo';
                     };
                 },
             'l', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setCompressioLevel( value );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 <= instance._compressioLevel ){
                         return 'l' + instance._compressioLevel;
                     };
                 },
             'e', GooglePhotoURL.DataTypes.UINT,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {number} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
                     instance.setMaxAge( value );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( 0 <= instance._maxAge ){
                         return 'e' + instance._maxAge;
                     };
                 },
             'ip', GooglePhotoURL.DataTypes.BOOLEAN,
-                function( /** @type {!GooglePhotoURL.Builder} */ instance, /** @type {boolean} */ value ){
+                function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
                     instance.setMetadataEnabled( true );
                 },
-                function( /** @type {!GooglePhotoURL.Builder} */ instance ){
+                function( /** @type {!Builder} */ instance ){
                     if( instance._metadataEnabled ){
                         return 'ip';
                     };
-                },
+                }
         ];
 
         function isGoogleUserContent( normalizedURL ){
-            return 0 < normalizedURL.indexof( 'blogger.googleusercontent.com/img/' );
+            return 0 < normalizedURL.indexOf( 'blogger.googleusercontent.com/img/' );
         };
 
         function isLegacyGoogleUserContent( normalizedURL ){
-            return 0 < normalizedURL.indexof( '.bp.blogspot.com/' );
+            return 0 < normalizedURL.indexOf( '.bp.blogspot.com/' );
         };
 
         /**
@@ -404,14 +415,14 @@ goog.scope(
         };
 
         /**
-         * @param {number} color 
+         * @param {number} uint
          * @return {string} */
-        function uintToColorString( color ){
-            if( 0xffffff < color ){
-                color = '0' + color.toString( 16 ).substr( 2 );
+        function uintToColorString( uint ){
+            if( 0xffffff < uint ){
+                var color = '0' + uint.toString( 16 ).substr( 2 );
                 return '0x' + color.substr( color.length - 8 );
             };
-            color = '00000' + color.toString( 16 ).substr( 2 );
+            color = '00000' + uint.toString( 16 ).substr( 2 );
             return '#' + color.substr( color.length - 6 );
         };
 
@@ -450,7 +461,7 @@ goog.scope(
 
             /**
              * @param {string} str 
-             * @return {string} */
+             * @return {number} */
             function colorStringToUINT( str ){
                 if( str.charAt( 0 ) === '#' ){
                     return hexToUINT( str.substr( 1, 2 ) ) * 0xffff +
@@ -469,7 +480,7 @@ goog.scope(
 
             /**
              * @param {string} param 
-             * @param {GooglePhotoURL.Builder | null} instance 
+             * @param {Builder | null} instance 
              * @return {boolean | void} */
             function initializeParam( param, instance ){
                 var i = 0, valid, commandLength, commandDifinition,
@@ -533,6 +544,7 @@ goog.scope(
             var urlElems      = url.split( '?' );
             var normalizedURL = urlElems[ 0 ];
             var searchParams  = urlElems[ 1 ];
+            var params;
 
             switch( getGooglePhotoGeneration( normalizedURL ) ){
                 case 2 :
@@ -660,11 +672,6 @@ goog.scope(
          * s: Force the scaling, ignoring the aspect ratio. Requires both w and h to be explicitly set. ignores nu.
          * @return {boolean} */
         Builder.prototype.getIngoringAspectRatio = function(){
-            if( GooglePhotoURL.DEFINE.DEBUG && test ){
-                if( !( 0 < this._width && 0 < this._height ) ){
-                    throw 'Ignoring the aspect ratio requires both w and h to be explicitly set.';
-                };
-            };
             return this._ingoringAspectRatio;
         };
 

@@ -7,5 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "itozyun <itozyun@gmail.com> (https://outcloud.blogspot.com/)",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^6.2.0",
+    "google-closure-compiler": "^20240317.0.0",
+    "gulp": "^4.0.2"
+  }
 }
