@@ -1,10 +1,8 @@
-declare class Bilder {
-    private _urlOrigin:string;
-    private _absolutePathOfSrcRoot:string|undefined;
-
-    static isGooglePhotoURL(normalizedURL:string):string;
-
+class Bilder {
     constructor(url:string);
+
+    getURL():string;
+    getBaseURL():string;
 
     getWidth():number;
     setWidth(width:number);
@@ -21,9 +19,9 @@ declare class Bilder {
     getCropping():boolean;
     setCropping(cropping:boolean);
     getCroppingToCircular():boolean;
-    setCroppingToCircular(croppingToCircular:boolean);
-    getCroppingDifferentFocus():boolean;
-    setCroppingDifferentFocus(croppingDifferentFocus:boolean);
+    setCroppingToCircular(croppingToCircular:boolean, opt_backgroundColor?:number);
+    getSmartCroppingEnabled():boolean;
+    setSmartCroppingEnabled(smartCroppingEnabled:boolean);
 
     isFreeCropping():boolean;
     getFreeCropping():number[];

@@ -37,11 +37,11 @@ GooglePhotoURL.OriginalFileFormats = {
  * @enum {number} */
 GooglePhotoURL.DataTypes = {
     BOOLEAN :  1,
-    NUMBER  :  2,
-    UINT    :  4,
-    COLOR   :  8,
-    PERCENT : 16,
-    STRING  : 32
+    // NUMBER  :  2,
+    UINT    :  2,
+    COLOR   :  4,
+    PERCENT :  8,
+    STRING  : 16
 };
 
 GooglePhotoURL.DEFINE = {};
@@ -144,7 +144,7 @@ goog.scope(
                     };
                 },
                 function( /** @type {!Builder} */ instance ){
-                    if( instance._cropping && !instance._croppingToCircular && !instance.isFreeCropping() ){
+                    if( instance._cropping && !instance.isFreeCropping() ){
                         return 'c';
                     };
                 },
@@ -159,10 +159,10 @@ goog.scope(
                 },
             'p', GooglePhotoURL.DataTypes.BOOLEAN,
                 function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
-                    instance.setCroppingDifferentFocus( true );
+                    instance.setSmartCroppingEnabled( true );
                 },
                 function( /** @type {!Builder} */ instance ){
-                    if( instance._croppingDifferentFocus ){
+                    if( instance._smartCroppingEnabled && instance._cropping ){
                         return 'p';
                     };
                 },
@@ -400,6 +400,8 @@ goog.scope(
         /**
          * 1: ?.bp.blogspot.com/.../.../.../s1600/005.png
          * 2: //lh?.googleusercontent.com/img/a/......=w176-h176-n-o
+         *      Url of image uploaded in blogger changed to https://blogger.googleusercontent.com/img/a/...
+         *      https://support.google.com/blogger/thread/121615855/url-of-image-uploaded-in-blogger-changed-to-https-blogger-googleusercontent-com-img-a?hl=en-GB
          * 3: //lh?.googleusercontent.com/.../.../.../s1600/005.png */
         function getGooglePhotoGeneration( normalizedURL ){
             return isGoogleUserContent( normalizedURL )
@@ -423,7 +425,7 @@ goog.scope(
                 return '0x' + color.substr( color.length - 8 );
             };
             color = '00000' + uint.toString( 16 ).substr( 2 );
-            return '#' + color.substr( color.length - 6 );
+            return '0x' + color.substr( color.length - 6 );
         };
 
         /**
@@ -483,8 +485,8 @@ goog.scope(
              * @param {Builder | null} instance 
              * @return {boolean | void} */
             function initializeParam( param, instance ){
-                var i = 0, valid, commandLength, commandDifinition,
-                    originalValue, dataType, value;
+                var i = 0, commandLength, commandDifinition,
+                    originalValue, dataType, value, valid;
 
                 for( ; commandLength = [ 8, 4, 3, 2, 1 ][ i ]; ++i ){
                     commandDifinition = getCommandDifinition( param.substr( 0, commandLength ) );
@@ -497,12 +499,12 @@ goog.scope(
                                 valid = true;
                             };
                         };
-                        if( dataType & GooglePhotoURL.DataTypes.NUMBER && !valid ){
+                        /* if( dataType & GooglePhotoURL.DataTypes.NUMBER && !valid ){
                             value = parseFloat( originalValue );
                             if( 0 <= value ){
                                 valid = true;
                             };
-                        };
+                        }; */
                         if( dataType & GooglePhotoURL.DataTypes.UINT && !valid ){
                             value = parseInt( originalValue, 10 );
                             if( 0 <= value ){
@@ -529,7 +531,7 @@ goog.scope(
                         };
                         if( valid ){
                             if( instance ){
-                                commandDifinition[ 2 ]( this, value );
+                                commandDifinition[ 2 ]( instance, value );
                             };
                             return valid;
                         };
@@ -570,11 +572,11 @@ goog.scope(
                     };
             };
 
-            this._normalizedURL = normalizedURL;
-            this._searchParams  = searchParams;
-            this._upscaling     = true;
-            this._mixRatio      = 0;
-            this._maxAge        = 30;
+            this._baseURL      = normalizedURL;
+            this._searchParams = searchParams;
+            this._upscaling    = true;
+            this._mixRatio     = 0;
+         // this._maxAge       = 30;
 
             if( params ){
                 currentColor = currentBackgroundColor = currentPaddingColor = undefined;
@@ -588,13 +590,13 @@ goog.scope(
 
         /** @return {string} */
         Builder.prototype.getURL = function(){
-            var normalizedURL = this._normalizedURL,
+            var baseURL = this._baseURL,
                 params = '', j = 3, param, urlElems;
 
             backgroundColorRequired = false;
 
             for( ; j < COMMAND_DIFINITIONS.length; j += 4 ){
-                param = COMMAND_DIFINITIONS[ j ]( this );
+                param = COMMAND_DIFINITIONS[ j ] && COMMAND_DIFINITIONS[ j ]( this );
                 if( param ){
                     params += '-' + param;
                 };
@@ -606,20 +608,20 @@ goog.scope(
             };
 
             if( params ){
-                if( getGooglePhotoGeneration( normalizedURL ) === 2 ){
-                    normalizedURL += '=' + params;
+                if( getGooglePhotoGeneration( baseURL ) === 2 ){
+                    baseURL += '=' + params;
                 } else {
-                    urlElems = normalizedURL.split( '/' );
+                    urlElems = baseURL.split( '/' );
                     urlElems.splice( urlElems.length - 2, 0, params );
-                    normalizedURL = urlElems.join( '/' );
+                    baseURL = urlElems.join( '/' );
                 };
             };
-            return normalizedURL + ( this._searchParams ? '?' + this._searchParams : '' );
+            return baseURL + ( this._searchParams ? '?' + this._searchParams : '' );
         };
 
         /** @return {string} */
-        Builder.prototype.getURLWithoutParams = function(){
-            return this._normalizedURL + ( this._searchParams ? '?' + this._searchParams : '' );
+        Builder.prototype.getBaseURL = function(){
+            return this._baseURL + ( this._searchParams ? '?' + this._searchParams : '' );
         };
 
     /**------------------------------------------------------------------------
@@ -697,9 +699,6 @@ goog.scope(
         /** @param {boolean} cropping */
         Builder.prototype.setCropping = function( cropping ){
             this._cropping = cropping;
-            if( !cropping ){
-                this._croppingToCircular = false;
-            };
         };
 
         /**
@@ -709,9 +708,14 @@ goog.scope(
             return this._croppingToCircular;
         };
 
-        /** @param {boolean} croppingToCircular */
-        Builder.prototype.setCroppingToCircular = function( croppingToCircular ){
-            this._cropping = this._croppingToCircular = croppingToCircular;
+        /**
+         * @param {boolean} croppingToCircular
+         * @param {number=} opt_backgroundColor */
+        Builder.prototype.setCroppingToCircular = function( croppingToCircular, opt_backgroundColor ){
+            this._croppingToCircular = croppingToCircular;
+            if( croppingToCircular && 0 <= opt_backgroundColor ){
+                this._backgroundColor = opt_backgroundColor;
+            };
         };
 
         /**
@@ -720,19 +724,19 @@ goog.scope(
          * pp:
          * n:
          * @return {boolean} */
-        Builder.prototype.getCroppingDifferentFocus = function(){
-            return this._croppingDifferentFocus;
+        Builder.prototype.getSmartCroppingEnabled = function(){
+            return this._smartCroppingEnabled;
         };
 
-        /** @param {boolean} croppingDifferentFocus */
-        Builder.prototype.setCroppingDifferentFocus = function( croppingDifferentFocus ){
-            this._croppingDifferentFocus = croppingDifferentFocus;
+        /** @param {boolean} smartCroppingEnabled */
+        Builder.prototype.setSmartCroppingEnabled = function( smartCroppingEnabled ){
+            this._smartCroppingEnabled = smartCroppingEnabled;
         };
 
         /** @return {boolean} */
         Builder.prototype.isFreeCropping = function(){
-            return !( 0 <= this._croppingLeft && this._croppingLeft < this._croppingRight  && this._croppingRight  <= 100 &&
-                      0 <= this._croppingTop  && this._croppingTop  < this._croppingBottom && this._croppingBottom <= 100 )
+            return 0 <= this._croppingLeft && this._croppingLeft < this._croppingRight  && this._croppingRight  <= 100 &&
+                   0 <= this._croppingTop  && this._croppingTop  < this._croppingBottom && this._croppingBottom <= 100;
         };
 
         /**
@@ -948,7 +952,7 @@ goog.scope(
         Builder.prototype.setMixRatio = function( mixRatio ){
             if( GooglePhotoURL.DEFINE.DEBUG ){
                 if( !( 0 <= mixRatio && mixRatio <= 100 ) ){
-                    throw '[setMixRatio] Invalid value. opt_mixRatio=' + mixRatio;
+                    throw '[setMixRatio] Invalid value. mixRatio=' + mixRatio;
                 };
             };
             this._mixRatio = mixRatio;
