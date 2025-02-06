@@ -971,7 +971,7 @@ var $jscomp$scope$m464985988$0$currentColor, $jscomp$scope$m464985988$1$currentB
   a._htmlOutputEnabled && b.push("h");
   return b.join("-");
 }, "s", GooglePhotoURL.DataTypes.BOOLEAN | GooglePhotoURL.DataTypes.UINT, function(a, b) {
-  !0 === b ? a.setIngoringAspectRatio(!0) : a.setSize(b);
+  !0 === b ? a.setIgoringAspectRatio(!0) : a.setSize(b);
 }, function(a) {
   var b = [];
   0 <= a._width && a._width === a._height && b.push("s" + a._width);
@@ -989,32 +989,32 @@ var $jscomp$scope$m464985988$0$currentColor, $jscomp$scope$m464985988$1$currentB
     return "nu";
   }
 }, "c", GooglePhotoURL.DataTypes.BOOLEAN | GooglePhotoURL.DataTypes.COLOR, function(a, b) {
-  !0 === b ? a.setClopping(!0) : $jscomp$scope$m464985988$0$currentColor = b;
+  !0 === b ? a.setCropping(!0) : $jscomp$scope$m464985988$0$currentColor = b;
 }, function(a) {
-  if (a._clopping && !a._cloppingToCircular && !a.isFreeClopping()) {
+  if (a._cropping && !a._croppingToCircular && !a.isFreeCropping()) {
     return "c";
   }
 }, "cc", GooglePhotoURL.DataTypes.BOOLEAN, function(a, b) {
-  a.setCloppingToCircular(!0);
+  a.setCroppingToCircular(!0);
 }, function(a) {
-  if (a._cloppingToCircular) {
+  if (a._croppingToCircular) {
     return "cc";
   }
 }, "p", GooglePhotoURL.DataTypes.BOOLEAN, function(a, b) {
-  a.setCloppingDifferentFocus(!0);
+  a.setCroppingDifferentFocus(!0);
 }, function(a) {
-  if (a._cloppingDifferentFocus) {
+  if (a._croppingDifferentFocus) {
     return "p";
   }
 }, "fcrop64=", GooglePhotoURL.DataTypes.STRING, function(a, b) {
-  a.setFreeClopping($jscomp$scope$m464985988$8$hexToUINT(b.substr(2, 4)) / 65535 * 100, $jscomp$scope$m464985988$8$hexToUINT(b.substr(6, 4)) / 65535 * 100, $jscomp$scope$m464985988$8$hexToUINT(b.substr(10, 4)) / 65535 * 100, $jscomp$scope$m464985988$8$hexToUINT(b.substr(14, 4)) / 65535 * 100);
+  a.setFreeCropping($jscomp$scope$m464985988$8$hexToUINT(b.substr(2, 4)) / 65535 * 100, $jscomp$scope$m464985988$8$hexToUINT(b.substr(6, 4)) / 65535 * 100, $jscomp$scope$m464985988$8$hexToUINT(b.substr(10, 4)) / 65535 * 100, $jscomp$scope$m464985988$8$hexToUINT(b.substr(14, 4)) / 65535 * 100);
 }, function(a) {
   function b(c) {
     c = "000" + (c / 1000 * 65535 | 0).toString(16).substr(2);
     return c.substr(c.length - 4);
   }
-  if (a.isFreeClopping()) {
-    return "fcrop64=1," + b(a._clippingLeft) + b(a._clippingTop) + b(a._clippingRight) + b(a._clippingBottom);
+  if (a.isFreeCropping()) {
+    return "fcrop64=1," + b(a._croppingLeft) + b(a._croppingTop) + b(a._croppingRight) + b(a._croppingBottom);
   }
 }, "fh", GooglePhotoURL.DataTypes.BOOLEAN, function(a, b) {
   a.setFlippingHorizontally(!0);
@@ -1041,7 +1041,7 @@ var $jscomp$scope$m464985988$0$currentColor, $jscomp$scope$m464985988$1$currentB
     return "ba" + a._badge;
   }
 }, "b", GooglePhotoURL.DataTypes.UINT, function(a, b) {
-  a.setBorder(b, $jscomp$scope$m464985988$0$currentColor);
+  a.setBorderWidth(b, $jscomp$scope$m464985988$0$currentColor);
 }, function(a) {
   if (0 < a._borderWidth) {
     return (0 <= a._borderColor ? "c" + $jscomp$scope$m464985988$9$uintToColorString(a._borderColor) + "-" : "") + "b" + a._borderWidth;
@@ -1114,11 +1114,11 @@ var $jscomp$scope$m464985988$0$currentColor, $jscomp$scope$m464985988$1$currentB
 }, "ft", GooglePhotoURL.DataTypes.BOOLEAN, function(a, b) {
   a.setLoselessCompressioEnabled(!0);
 }, function(a) {
-  if (a._loselessCompressioEnabled) {
+  if (a._losslessCompressioEnabled) {
     return "ft";
   }
 }, "lo", GooglePhotoURL.DataTypes.BOOLEAN, function(a, b) {
-  a.setForcingLoselessCompressioEnabled(!0);
+  a.setForcingLosslessCompressionEnabled(!0);
 }, function(a) {
   if (a._forcingLoselessCompressioEnabled) {
     return "lo";
@@ -1179,48 +1179,48 @@ $jscomp$scope$m464985988$10$Builder.prototype.getUpscaling = function() {
 $jscomp$scope$m464985988$10$Builder.prototype.setUpscaling = function(a) {
   this._upscaling = a;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getIngoringAspectRatio = function() {
+$jscomp$scope$m464985988$10$Builder.prototype.getIgoringAspectRatio = function() {
   return this._ingoringAspectRatio;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.setIngoringAspectRatio = function(a) {
+$jscomp$scope$m464985988$10$Builder.prototype.setIgoringAspectRatio = function(a) {
   if (this._ingoringAspectRatio = a) {
     this._upscaling = !0;
   }
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getClopping = function() {
-  return this._clopping;
+$jscomp$scope$m464985988$10$Builder.prototype.getCropping = function() {
+  return this._cropping;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.setClopping = function(a) {
-  this._clopping = a;
-  a || (this._cloppingToCircular = !1);
+$jscomp$scope$m464985988$10$Builder.prototype.setCropping = function(a) {
+  this._cropping = a;
+  a || (this._croppingToCircular = !1);
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getCloppingToCircular = function() {
-  return this._cloppingToCircular;
+$jscomp$scope$m464985988$10$Builder.prototype.getCroppingToCircular = function() {
+  return this._croppingToCircular;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.setCloppingToCircular = function(a) {
-  this._clopping = this._cloppingToCircular = a;
+$jscomp$scope$m464985988$10$Builder.prototype.setCroppingToCircular = function(a) {
+  this._cropping = this._croppingToCircular = a;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getCloppingDifferentFocus = function() {
-  return this._cloppingDifferentFocus;
+$jscomp$scope$m464985988$10$Builder.prototype.getCroppingDifferentFocus = function() {
+  return this._croppingDifferentFocus;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.setCloppingDifferentFocus = function(a) {
-  this._cloppingDifferentFocus = a;
+$jscomp$scope$m464985988$10$Builder.prototype.setCroppingDifferentFocus = function(a) {
+  this._croppingDifferentFocus = a;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.isFreeClopping = function() {
-  return !(0 <= this._clippingLeft && this._clippingLeft < this._clippingRight && 100 >= this._clippingRight && 0 <= this._clippingTop && this._clippingTop < this._clippingBottom && 100 >= this._clippingBottom);
+$jscomp$scope$m464985988$10$Builder.prototype.isFreeCropping = function() {
+  return !(0 <= this._croppingLeft && this._croppingLeft < this._croppingRight && 100 >= this._croppingRight && 0 <= this._croppingTop && this._croppingTop < this._croppingBottom && 100 >= this._croppingBottom);
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getFreeClopping = function() {
-  return this.isFreeClopping() ? [this._clippingLeft, this._clippingTop, this._clippingRight, this._clippingBottom] : null;
+$jscomp$scope$m464985988$10$Builder.prototype.getFreeCropping = function() {
+  return this.isFreeCropping() ? [this._croppingLeft, this._croppingTop, this._croppingRight, this._croppingBottom] : null;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.setFreeClopping = function(a, b, c, d) {
+$jscomp$scope$m464985988$10$Builder.prototype.setFreeCropping = function(a, b, c, d) {
   if (GooglePhotoURL.DEFINE.DEBUG && !(0 <= a && a <= c && 100 >= c && 0 <= b && b <= d && 100 >= d)) {
-    throw "[setFreeClopping] Invalid value." + a + " " + b + " " + c + " " + d;
+    throw "[setFreeCropping] Invalid value." + a + " " + b + " " + c + " " + d;
   }
-  this._clippingLeft = a;
-  this._clippingTop = b;
-  this._clippingRight = c;
-  this._clippingBottom = d;
-  this.setClopping(0 < a + b || 200 > c + d);
+  this._croppingLeft = a;
+  this._croppingTop = b;
+  this._croppingRight = c;
+  this._croppingBottom = d;
+  this.setCropping(0 < a + b || 200 > c + d);
 };
 $jscomp$scope$m464985988$10$Builder.prototype.getFlippingHorizontally = function() {
   return this._flippingHorizontally;
@@ -1252,36 +1252,60 @@ $jscomp$scope$m464985988$10$Builder.prototype.setBadge = function(a) {
   }
   this._badge = a;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getBorder = function() {
-  return [this._borderWidth, this._borderColor];
+$jscomp$scope$m464985988$10$Builder.prototype.getBorderWidth = function() {
+  return this._borderWidth;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.setBorder = function(a, b) {
+$jscomp$scope$m464985988$10$Builder.prototype.setBorderWidth = function(a, b) {
   this._borderWidth = a;
   0 <= b && (this._borderColor = b);
 };
+$jscomp$scope$m464985988$10$Builder.prototype.getBorderColor = function() {
+  return this._borderColor;
+};
+$jscomp$scope$m464985988$10$Builder.prototype.setBorderColor = function(a) {
+  this._borderColor = a;
+};
 $jscomp$scope$m464985988$10$Builder.prototype.getBorderRadius = function() {
-  return [this._borderRadius, this._backgroundColor];
+  return this._borderRadius;
 };
 $jscomp$scope$m464985988$10$Builder.prototype.setBorderRadius = function(a, b) {
   this._borderRadius = a;
   0 <= b && (this._backgroundColor = b);
 };
+$jscomp$scope$m464985988$10$Builder.prototype.getBackgroundColor = function() {
+  return this._backgroundColor;
+};
+$jscomp$scope$m464985988$10$Builder.prototype.setBackgroundColor = function(a) {
+  this._backgroundColor = a;
+};
 $jscomp$scope$m464985988$10$Builder.prototype.getPadding = function() {
-  return [this._borderRadius, this._paddingColor];
+  return this._padding;
 };
 $jscomp$scope$m464985988$10$Builder.prototype.setPadding = function(a, b) {
   this._padding = a;
   0 <= b && (this._paddingColor = b);
 };
+$jscomp$scope$m464985988$10$Builder.prototype.getPaddingColor = function() {
+  return this._paddingColor;
+};
+$jscomp$scope$m464985988$10$Builder.prototype.setPaddingColor = function(a) {
+  this._paddingColor = a;
+};
 $jscomp$scope$m464985988$10$Builder.prototype.getBlur = function() {
-  return 0 < this._blurringAmount ? [this._blurringAmount, this._mixRatio] : null;
+  return this._blurringAmount;
 };
 $jscomp$scope$m464985988$10$Builder.prototype.setBlur = function(a, b) {
-  if (GooglePhotoURL.DEFINE.DEBUG && !(0 <= b && 100 >= b && void 0 !== b)) {
-    throw "[setBlur] Invalid value. opt_mixRatio=" + b;
-  }
   this._blurringAmount = a;
-  this._mixRatio = b || 0;
+  0 <= b && this.setMixRatio(b);
+};
+$jscomp$scope$m464985988$10$Builder.prototype.getMixRatio = function() {
+  return this._mixRatio;
+};
+$jscomp$scope$m464985988$10$Builder.prototype.setMixRatio = function(a) {
+  if (GooglePhotoURL.DEFINE.DEBUG && !(0 <= a && 100 >= a)) {
+    throw "[setMixRatio] Invalid value. opt_mixRatio=" + a;
+  }
+  this._mixRatio = a;
 };
 $jscomp$scope$m464985988$10$Builder.prototype.getFileFormat = function() {
   return this._fileFormat;
@@ -1291,6 +1315,7 @@ $jscomp$scope$m464985988$10$Builder.prototype.setFileFormat = function(a, b) {
     throw "[setFileFormat] Invalid value. fileFormat=" + a;
   }
   this._fileFormat = a;
+  0 <= b && (this._backgroundColor = b);
 };
 $jscomp$scope$m464985988$10$Builder.prototype.getHTMLOutputEnabled = function() {
   return this._htmlOutputEnabled;
@@ -1298,16 +1323,16 @@ $jscomp$scope$m464985988$10$Builder.prototype.getHTMLOutputEnabled = function() 
 $jscomp$scope$m464985988$10$Builder.prototype.setHTMLOutputEnabled = function(a) {
   this._htmlOutputEnabled = a;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getLoselessCompressionEnabled = function() {
-  return this._loselessCompressioEnabled;
+$jscomp$scope$m464985988$10$Builder.prototype.getLosslessCompressionEnabled = function() {
+  return this._losslessCompressioEnabled;
 };
 $jscomp$scope$m464985988$10$Builder.prototype.setLoselessCompressioEnabled = function(a) {
-  this._loselessCompressioEnabled = a;
+  this._losslessCompressioEnabled = a;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.getForcingLoselessCompressionEnabled = function() {
+$jscomp$scope$m464985988$10$Builder.prototype.getForcingLosslessCompressionEnabled = function() {
   return this._forcingLoselessCompressioEnabled;
 };
-$jscomp$scope$m464985988$10$Builder.prototype.setForcingLoselessCompressioEnabled = function(a) {
+$jscomp$scope$m464985988$10$Builder.prototype.setForcingLosslessCompressionEnabled = function(a) {
   this._forcingLoselessCompressioEnabled = a;
 };
 $jscomp$scope$m464985988$10$Builder.prototype.getCompressionLevel = function() {

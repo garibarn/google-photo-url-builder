@@ -105,7 +105,7 @@ goog.scope(
             's', GooglePhotoURL.DataTypes.BOOLEAN | GooglePhotoURL.DataTypes.UINT,
                 function( /** @type {!Builder} */ instance, /** @type {number | boolean} */ value ){
                     if( value === true ){
-                        instance.setIngoringAspectRatio( true );
+                        instance.setIgoringAspectRatio( true );
                     } else {
                         instance.setSize( /** @type {number} */ (value) );
                     };
@@ -138,37 +138,37 @@ goog.scope(
             'c', GooglePhotoURL.DataTypes.BOOLEAN | GooglePhotoURL.DataTypes.COLOR,
                 function( /** @type {!Builder} */ instance, /** @type {number | boolean} */ value ){
                     if( value === true ){
-                        instance.setClopping( true );
+                        instance.setCropping( true );
                     } else {
                         currentColor = /** @type {number} */ (value);
                     };
                 },
                 function( /** @type {!Builder} */ instance ){
-                    if( instance._clopping && !instance._cloppingToCircular && !instance.isFreeClopping() ){
+                    if( instance._cropping && !instance._croppingToCircular && !instance.isFreeCropping() ){
                         return 'c';
                     };
                 },
             'cc', GooglePhotoURL.DataTypes.BOOLEAN,
                 function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
-                    instance.setCloppingToCircular( true );
+                    instance.setCroppingToCircular( true );
                 },
                 function( /** @type {!Builder} */ instance ){
-                    if( instance._cloppingToCircular ){
+                    if( instance._croppingToCircular ){
                         return 'cc';
                     };
                 },
             'p', GooglePhotoURL.DataTypes.BOOLEAN,
                 function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
-                    instance.setCloppingDifferentFocus( true );
+                    instance.setCroppingDifferentFocus( true );
                 },
                 function( /** @type {!Builder} */ instance ){
-                    if( instance._cloppingDifferentFocus ){
+                    if( instance._croppingDifferentFocus ){
                         return 'p';
                     };
                 },
             'fcrop64=', GooglePhotoURL.DataTypes.STRING,
                 function( /** @type {!Builder} */ instance, /** @type {string} */ value ){
-                    instance.setFreeClopping(
+                    instance.setFreeCropping(
                         hexToUINT( value.substr(  2, 4 ) ) / 0xffff * 100,
                         hexToUINT( value.substr(  6, 4 ) ) / 0xffff * 100,
                         hexToUINT( value.substr( 10, 4 ) ) / 0xffff * 100,
@@ -183,11 +183,11 @@ goog.scope(
                         var hex = '000' + ( percent / 1000 * 0xffff | 0 ).toString( 16 ).substr( 2 );
                         return hex.substr( hex.length - 4 );
                     };
-                    if( instance.isFreeClopping() ){
-                        return 'fcrop64=1,' + uintToHex( instance._clippingLeft   ) +
-                                              uintToHex( instance._clippingTop    ) +
-                                              uintToHex( instance._clippingRight  ) +
-                                              uintToHex( instance._clippingBottom );
+                    if( instance.isFreeCropping() ){
+                        return 'fcrop64=1,' + uintToHex( instance._croppingLeft   ) +
+                                              uintToHex( instance._croppingTop    ) +
+                                              uintToHex( instance._croppingRight  ) +
+                                              uintToHex( instance._croppingBottom );
                     };
                 },
             'fh', GooglePhotoURL.DataTypes.BOOLEAN,
@@ -228,7 +228,7 @@ goog.scope(
                 },
             'b', GooglePhotoURL.DataTypes.UINT,
                 function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
-                    instance.setBorder( value, currentColor );
+                    instance.setBorderWidth( value, currentColor );
                 },
                 function( /** @type {!Builder} */ instance ){
                     if( 0 < instance._borderWidth ){
@@ -347,13 +347,13 @@ goog.scope(
                     instance.setLoselessCompressioEnabled( true );
                 },
                 function( /** @type {!Builder} */ instance ){
-                    if( instance._loselessCompressioEnabled ){
+                    if( instance._losslessCompressioEnabled ){
                         return 'ft';
                     };
                 },
             'lo', GooglePhotoURL.DataTypes.BOOLEAN,
                 function( /** @type {!Builder} */ instance, /** @type {boolean} */ value ){
-                    instance.setForcingLoselessCompressioEnabled( true );
+                    instance.setForcingLosslessCompressionEnabled( true );
                 },
                 function( /** @type {!Builder} */ instance ){
                     if( instance._forcingLoselessCompressioEnabled ){
@@ -671,12 +671,12 @@ goog.scope(
         /**
          * s: Force the scaling, ignoring the aspect ratio. Requires both w and h to be explicitly set. ignores nu.
          * @return {boolean} */
-        Builder.prototype.getIngoringAspectRatio = function(){
+        Builder.prototype.getIgoringAspectRatio = function(){
             return this._ingoringAspectRatio;
         };
 
         /** @param {boolean} ingoringAspectRatio */
-        Builder.prototype.setIngoringAspectRatio = function( ingoringAspectRatio ){
+        Builder.prototype.setIgoringAspectRatio = function( ingoringAspectRatio ){
             this._ingoringAspectRatio = ingoringAspectRatio;
             if( ingoringAspectRatio ){
                 this._upscaling = true;
@@ -690,28 +690,28 @@ goog.scope(
         /**
          * c: crop the image
          * @return {boolean} */
-        Builder.prototype.getClopping = function(){
-            return this._clopping;
+        Builder.prototype.getCropping = function(){
+            return this._cropping;
         };
 
-        /** @param {boolean} clopping */
-        Builder.prototype.setClopping = function( clopping ){
-            this._clopping = clopping;
-            if( !clopping ){
-                this._cloppingToCircular = false;
+        /** @param {boolean} cropping */
+        Builder.prototype.setCropping = function( cropping ){
+            this._cropping = cropping;
+            if( !cropping ){
+                this._croppingToCircular = false;
             };
         };
 
         /**
          * cc: circular mask applied over the crop. see also bc# background color option below.
          * @return {boolean} */
-        Builder.prototype.getCloppingToCircular = function(){
-            return this._cloppingToCircular;
+        Builder.prototype.getCroppingToCircular = function(){
+            return this._croppingToCircular;
         };
 
-        /** @param {boolean} cloppingToCircular */
-        Builder.prototype.setCloppingToCircular = function( cloppingToCircular ){
-            this._clopping = this._cloppingToCircular = cloppingToCircular;
+        /** @param {boolean} croppingToCircular */
+        Builder.prototype.setCroppingToCircular = function( croppingToCircular ){
+            this._cropping = this._croppingToCircular = croppingToCircular;
         };
 
         /**
@@ -720,19 +720,19 @@ goog.scope(
          * pp:
          * n:
          * @return {boolean} */
-        Builder.prototype.getCloppingDifferentFocus = function(){
-            return this._cloppingDifferentFocus;
+        Builder.prototype.getCroppingDifferentFocus = function(){
+            return this._croppingDifferentFocus;
         };
 
-        /** @param {boolean} cloppingDifferentFocus */
-        Builder.prototype.setCloppingDifferentFocus = function( cloppingDifferentFocus ){
-            this._cloppingDifferentFocus = cloppingDifferentFocus;
+        /** @param {boolean} croppingDifferentFocus */
+        Builder.prototype.setCroppingDifferentFocus = function( croppingDifferentFocus ){
+            this._croppingDifferentFocus = croppingDifferentFocus;
         };
 
         /** @return {boolean} */
-        Builder.prototype.isFreeClopping = function(){
-            return !( 0 <= this._clippingLeft && this._clippingLeft < this._clippingRight  && this._clippingRight  <= 100 &&
-                      0 <= this._clippingTop  && this._clippingTop  < this._clippingBottom && this._clippingBottom <= 100 )
+        Builder.prototype.isFreeCropping = function(){
+            return !( 0 <= this._croppingLeft && this._croppingLeft < this._croppingRight  && this._croppingRight  <= 100 &&
+                      0 <= this._croppingTop  && this._croppingTop  < this._croppingBottom && this._croppingBottom <= 100 )
         };
 
         /**
@@ -743,8 +743,8 @@ goog.scope(
          *   percent. For instance, fcrop64=1,00008000ffffffff would give you the bottom half of the picture.
          * @return {Array.<number>}
          */
-        Builder.prototype.getFreeClopping = function(){
-            return this.isFreeClopping() ? [ this._clippingLeft, this._clippingTop, this._clippingRight, this._clippingBottom ] : null;
+        Builder.prototype.getFreeCropping = function(){
+            return this.isFreeCropping() ? [ this._croppingLeft, this._croppingTop, this._croppingRight, this._croppingBottom ] : null;
         };
 
         /**
@@ -753,20 +753,20 @@ goog.scope(
          * @param {number} right %
          * @param {number} bottom %
          */
-        Builder.prototype.setFreeClopping = function( left, top, right, bottom ){
+        Builder.prototype.setFreeCropping = function( left, top, right, bottom ){
             if( GooglePhotoURL.DEFINE.DEBUG ){
                 if( !( 0 <= left && left <= right  && right  <= 100 &&
                        0 <= top  && top  <= bottom && bottom <= 100 )
                 ){
-                    throw '[setFreeClopping] Invalid value.' + left + ' ' + top + ' ' + right + ' ' + bottom;
+                    throw '[setFreeCropping] Invalid value.' + left + ' ' + top + ' ' + right + ' ' + bottom;
                 };
             };
-            this._clippingLeft   = left;
-            this._clippingTop    = top;
-            this._clippingRight  = right;
-            this._clippingBottom = bottom;
+            this._croppingLeft   = left;
+            this._croppingTop    = top;
+            this._croppingRight  = right;
+            this._croppingBottom = bottom;
 
-            this.setClopping( 0 < left + top || right + bottom < 200 );
+            this.setCropping( 0 < left + top || right + bottom < 200 );
         };
 
     /**------------------------------------------------------------------------
@@ -821,7 +821,7 @@ goog.scope(
             return this._badge;
         };
 
-        /** @param {number} badge */
+        /** @param {number} badge 0 to 11 */
         Builder.prototype.setBadge = function( badge ){
             if( GooglePhotoURL.DEFINE.DEBUG ){
                 if( !( 0 <= badge && badge <= 11 ) ){
@@ -834,46 +834,66 @@ goog.scope(
         /**
          * b#: adds a border of #px width in c# color. Does not play well together with other editing parameters.
          * 
-         * @return {!Array.<number | string>} */
-        Builder.prototype.getBorder = function(){
-            return [ this._borderWidth, this._borderColor ];
+         * @return {number} */
+        Builder.prototype.getBorderWidth = function(){
+            return this._borderWidth;
         };
 
         /**
          * @param {number} borderWidth 
          * @param {number=} opt_borderColor */
-        Builder.prototype.setBorder = function( borderWidth, opt_borderColor ){
+        Builder.prototype.setBorderWidth = function( borderWidth, opt_borderColor ){
             this._borderWidth = borderWidth;
             if( 0 <= opt_borderColor ){
                 this._borderColor = opt_borderColor;
             };
         };
 
+        /** @return {number} */
+        Builder.prototype.getBorderColor = function(){
+            return this._borderColor;
+        };
+
+        /**
+         * @param {number} borderColor */
+        Builder.prototype.setBorderColor = function( borderColor ){
+            this._borderColor = borderColor;
+        };
+
         /**
          * br#: border radius of #px. (can be used without specifying a border.) see also bc# background color option below.
          * 
-         * @return {!Array.<number>} */
+         * @return {number} */
         Builder.prototype.getBorderRadius = function(){
-            return [ this._borderRadius, this._backgroundColor ];
+            return this._borderRadius;
         };
 
         /**
          * @param {number} borderRadius 
          * @param {number=} opt_backgroundColor */
         Builder.prototype.setBorderRadius = function( borderRadius, opt_backgroundColor ){
-            this._borderRadius    = borderRadius;
+            this._borderRadius = borderRadius;
             if( 0 <= opt_backgroundColor ){
                 this._backgroundColor = opt_backgroundColor;
             };
         };
 
+        /** @return {number} */
+        Builder.prototype.getBackgroundColor = function(){
+            return this._backgroundColor;
+        };
+
+        /**
+         * @param {number} backgroundColor */
+        Builder.prototype.setBackgroundColor = function( backgroundColor ){
+            this._backgroundColor = backgroundColor;
+        };
+
         /**
          * pd(#): pads the image to the given size using pc# color
-         * pc(#): set the background color for padded images. If not set, falls back to c#, or black.
-         *        Accepts hex input: bc0xrrggbb or bc0xaarrggbb (defaults to transparent)
-         * @return {!Array.<number | string>} */
+         * @return {number} */
         Builder.prototype.getPadding = function(){
-            return [ this._borderRadius, this._paddingColor ];
+            return this._padding;
         };
 
         /**
@@ -887,24 +907,51 @@ goog.scope(
         };
 
         /**
+         * pc(#): set the background color for padded images. If not set, falls back to c#, or black.
+         *        Accepts hex input: bc0xrrggbb or bc0xaarrggbb (defaults to transparent)
+         * @return {number} */
+        Builder.prototype.getPaddingColor = function(){
+            return this._paddingColor;
+        };
+
+        /**
+         * @param {number} paddingColor */
+        Builder.prototype.setPaddingColor = function( paddingColor ){
+            this._paddingColor = paddingColor;
+        };
+
+        /**
          * fSoften=a,b,c: blurs the image, mixed with the non-blurred image. Parameter a doesn't seem to make any difference,
          *                b specifies the blurring amount and c the mix with 0 being all blurred and 100 being the original image
-         * @return {Array.<number>} */
+         * @return {number} */
         Builder.prototype.getBlur = function(){
-            return 0 < this._blurringAmount ? [ this._blurringAmount, this._mixRatio ] : null;
+            return this._blurringAmount;
         };
 
         /**
          * @param {number} blurringAmount
          * @param {number=} opt_mixRatio */
         Builder.prototype.setBlur = function( blurringAmount, opt_mixRatio ){
+            this._blurringAmount = blurringAmount;
+            if( 0 <= opt_mixRatio ){
+                this.setMixRatio( opt_mixRatio );
+            };
+        };
+
+        /** @return {number} */
+        Builder.prototype.getMixRatio = function(){
+            return this._mixRatio;
+        };
+
+        /**
+         * @param {number} mixRatio */
+        Builder.prototype.setMixRatio = function( mixRatio ){
             if( GooglePhotoURL.DEFINE.DEBUG ){
-                if( !( 0 <= opt_mixRatio && opt_mixRatio <= 100 && opt_mixRatio !== undefined ) ){
-                    throw '[setBlur] Invalid value. opt_mixRatio=' + opt_mixRatio;
+                if( !( 0 <= mixRatio && mixRatio <= 100 ) ){
+                    throw '[setMixRatio] Invalid value. opt_mixRatio=' + mixRatio;
                 };
             };
-            this._blurringAmount = blurringAmount;
-            this._mixRatio       = opt_mixRatio || 0;
+            this._mixRatio = mixRatio;
         };
 
     /**------------------------------------------------------------------------
@@ -935,6 +982,9 @@ goog.scope(
                 };
             };
             this._fileFormat = fileFormat;
+            if( 0 <= opt_backgroundColor ){
+                this._backgroundColor = opt_backgroundColor;
+            };
         };
 
         /**
@@ -954,13 +1004,13 @@ goog.scope(
          * ng: probably like ft above, just not quite as efficient.
          *
          * @return {boolean} */
-        Builder.prototype.getLoselessCompressionEnabled = function(){
-            return this._loselessCompressioEnabled;
+        Builder.prototype.getLosslessCompressionEnabled = function(){
+            return this._losslessCompressioEnabled;
         };
 
-        /** @param {boolean} loselessCompressioEnabled */
-        Builder.prototype.setLoselessCompressioEnabled = function( loselessCompressioEnabled ){
-            this._loselessCompressioEnabled = loselessCompressioEnabled;
+        /** @param {boolean} losslessCompressioEnabled */
+        Builder.prototype.setLoselessCompressioEnabled = function( losslessCompressioEnabled ){
+            this._losslessCompressioEnabled = losslessCompressioEnabled;
         };
 
         /**
@@ -968,12 +1018,12 @@ goog.scope(
          *     and will default to the lossless one for PNG input, ignoring l#.
          *
          * @return {boolean} */
-        Builder.prototype.getForcingLoselessCompressionEnabled = function(){
+        Builder.prototype.getForcingLosslessCompressionEnabled = function(){
             return this._forcingLoselessCompressioEnabled;
         };
 
         /** @param {boolean} forcingLoselessCompressioEnabled */
-        Builder.prototype.setForcingLoselessCompressioEnabled = function( forcingLoselessCompressioEnabled ){
+        Builder.prototype.setForcingLosslessCompressionEnabled = function( forcingLoselessCompressioEnabled ){
             this._forcingLoselessCompressioEnabled = forcingLoselessCompressioEnabled;
         };
 
