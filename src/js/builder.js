@@ -73,6 +73,14 @@ goog.scope(
      *************************************************************************/
         var currentColor, currentBackgroundColor, currentPaddingColor, backgroundColorRequired;
 
+        /**
+         * [4n+0] string param
+         * [4n+1] number type
+         * [4n+2] function setter
+         * [4n+3] function getter
+         * 
+         * @const {!Array.<string, number, !function(!Builder, (string | number | boolean | void)=):(string | void), boolean>}
+         */
         var COMMAND_DIFINITIONS = [
             'w', GooglePhotoURL.DataTypes.UINT,
                 function( /** @type {!Builder} */ instance, /** @type {number} */ value ){
@@ -435,7 +443,7 @@ goog.scope(
         function Builder( url ){
             /**
              * @param {string} command
-             * @return {Array | void} */
+             * @return {!Array.<string, number, !function(!Builder, (string | number | boolean | void)=):(string | void), boolean> | void} */
             function getCommandDifinition( command ){
                 for( var j = 0; j < COMMAND_DIFINITIONS.length; j += 4 ){
                     if( COMMAND_DIFINITIONS[ j ] === command ){
@@ -518,7 +526,7 @@ goog.scope(
                             };
                         };
                         if( dataType & GooglePhotoURL.DataTypes.PERCENT && !valid ){
-                            value = parseFloat( originalValue );
+                            value = parseInt( originalValue, 10 );
                             if( 0 <= value && value <= 100 ){
                                 valid = true;
                             };
@@ -531,6 +539,7 @@ goog.scope(
                         };
                         if( valid ){
                             if( instance ){
+                                /** @suppress {checkTypes} */
                                 commandDifinition[ 2 ]( instance, value );
                             };
                             return valid;
@@ -596,6 +605,7 @@ goog.scope(
             backgroundColorRequired = false;
 
             for( ; j < COMMAND_DIFINITIONS.length; j += 4 ){
+                /** @suppress {checkTypes} */
                 param = COMMAND_DIFINITIONS[ j ] && COMMAND_DIFINITIONS[ j ]( this );
                 if( param ){
                     params += '-' + param;

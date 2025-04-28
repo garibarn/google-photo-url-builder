@@ -34,7 +34,7 @@ var $jscomp$scope$m464985988$10$Builder = function(a) {
           m && (d = g, d = "#" === d.charAt(0) ? 65535 * $jscomp$scope$m464985988$8$hexToUINT(d.substr(1, 2)) + 255 * $jscomp$scope$m464985988$8$hexToUINT(d.substr(3, 2)) + $jscomp$scope$m464985988$8$hexToUINT(d.substr(5, 2)) : 8 === d.length ? 65535 * $jscomp$scope$m464985988$8$hexToUINT(d.substr(2, 2)) + 255 * $jscomp$scope$m464985988$8$hexToUINT(d.substr(4, 2)) + $jscomp$scope$m464985988$8$hexToUINT(d.substr(6, 2)) : 16777215 * $jscomp$scope$m464985988$8$hexToUINT(d.substr(2, 2)) + 65535 * $jscomp$scope$m464985988$8$hexToUINT(d.substr(4, 
           2)) + 255 * $jscomp$scope$m464985988$8$hexToUINT(d.substr(6, 2)) + $jscomp$scope$m464985988$8$hexToUINT(d.substr(8, 2)), h = !0);
         }
-        f & GooglePhotoURL.DataTypes.PERCENT && !h && (d = parseFloat(g), 0 <= d && 100 >= d && (h = !0));
+        f & GooglePhotoURL.DataTypes.PERCENT && !h && (d = parseInt(g, 10), 0 <= d && 100 >= d && (h = !0));
         f & GooglePhotoURL.DataTypes.STRING && !h && g && (d = g, h = !0);
         if (h) {
           if (q) {
